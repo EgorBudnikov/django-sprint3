@@ -1,19 +1,24 @@
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from .models import Post, Category
+from .constants import count_posts
+from .models import Category, Post
 
-now = timezone.now()
+
+def get_posts():
+    query_post = Post.objects.select_related(
+        'category', 'author', 'location'
+    ).filter(
+        pub_date__lte=timezone.now(),
+        is_published=True,
+        category__is_published=True
+    )
+    return query_post
 
 
 def index(request):
-    """Главная страница - 5 последних опубликованных постов"""
-    post_list = Post.objects.select_related('category').filter(
-        is_published=True,
-        pub_date__lte=now,
-        category__is_published=True
-    ).order_by('-id')[0:5]
+    """Главная страница - последние опубликованные посты"""
+    post_list = get_posts()[:count_posts]
     context = {
         'post_list': post_list,
     }
@@ -23,11 +28,8 @@ def index(request):
 def post_detail(request, post_id):
     """Cтраница поста"""
     post = get_object_or_404(
-        Post,
-        Q(pk=post_id)
-        & Q(pub_date__lte=now)
-        & Q(is_published=True)
-        & Q(category__is_published=True)
+        get_posts(),
+        pk=post_id,
     )
     context = {
         'post': post,
@@ -43,12 +45,7 @@ def category_posts(request, category_slug):
         slug=category_slug,
         is_published=True)
 
-    post_list = Post.objects.select_related('category').filter(
-        is_published=True,
-        pub_date__lte=now,
-        category=category,
-
-    )
+    post_list = get_posts()
 
     context = {
         'category': category,

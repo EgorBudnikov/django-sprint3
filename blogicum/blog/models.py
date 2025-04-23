@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from .constants import count_text_admin
+
 User = get_user_model()
 
 
@@ -33,7 +35,7 @@ class Category(PublishedModel):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title
+        return self.title[:count_text_admin]
 
 
 class Location(PublishedModel):
@@ -44,7 +46,7 @@ class Location(PublishedModel):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[:count_text_admin]
 
 
 class Post(PublishedModel):
@@ -60,20 +62,23 @@ class Post(PublishedModel):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Автор публикации'
+        verbose_name='Автор публикации',
+        related_name='posts_author'
     )
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name='Местоположение'
+        verbose_name='Местоположение',
+        related_name='posts_location'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name='Категория'
+        verbose_name='Категория',
+        related_name='posts_category'
     )
 
     class Meta:
@@ -82,4 +87,4 @@ class Post(PublishedModel):
         ordering = ['-pub_date']
 
     def __str__(self):
-        return self.title
+        return self.title[:count_text_admin]
