@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from .constants import count_posts
+from .constants import Count_posts
 from .models import Category, Post
 
 
@@ -18,7 +18,7 @@ def get_posts():
 
 def index(request):
     """Главная страница - последние опубликованные посты"""
-    post_list = get_posts()[:count_posts]
+    post_list = get_posts()[:Count_posts]
     context = {
         'post_list': post_list,
     }
