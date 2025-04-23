@@ -45,7 +45,7 @@ def category_posts(request, category_slug):
         slug=category_slug,
         is_published=True)
 
-    post_list = get_posts()
+    post_list = get_posts().filter(category=category)
 
     context = {
         'category': category,
